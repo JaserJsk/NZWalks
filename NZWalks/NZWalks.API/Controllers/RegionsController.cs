@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
 
@@ -20,12 +19,12 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllRegions() {
-
+        public async Task<IActionResult> GetAllRegionsAsync() 
+        {
             var regions = await regionRepository.GetAllAsync();
 
             /*
-            var regionsDTO = new List<RegionDTO>();
+            var response = new List<RegionDTO>();
 
             regions.ToList().ForEach(domain =>
             {
@@ -39,13 +38,31 @@ namespace NZWalks.API.Controllers
                     Long = domain.Long,
                     Population = domain.Population,
                 };
-                regionsDTO.Add(dto);
+                response.Add(dto);
             });
             */
 
-            var regionsDTO = mapper.Map<List<RegionDTO>>(regions);
+            var response = mapper.Map<List<RegionDTO>>(regions);
 
-            return Ok(regionsDTO); 
+            return Ok(response); 
         }
+
+        
+        [HttpGet]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> GetRegionsAsync(Guid id)
+        {
+            var region = await regionRepository.GetAsync(id);
+
+            if (region == null)
+            {
+                return NotFound();
+            }
+
+            var response = mapper.Map<RegionDTO>(region);
+
+            return Ok(response);
+        }
+        
     }
 }
